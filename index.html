@@ -1,0 +1,101 @@
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>IAM - Inteligência Artificial Medeiros</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+      body {
+        font-family: 'Inter', sans-serif;
+      }
+      .prose {
+        max-width: none;
+      }
+      .prose p { margin-bottom: 1rem; line-height: 1.6; }
+      .prose ul, .prose ol { margin-bottom: 1rem; padding-left: 1.5rem; }
+      .prose li { margin-bottom: 0.25rem; }
+      .prose strong { color: #059669; font-weight: 700; }
+      .prose h1, .prose h2, .prose h3 { font-weight: 700; margin-top: 1.5rem; margin-bottom: 0.75rem; color: #1e293b; }
+      .prose blockquote { border-left: 4px solid #10b981; padding-left: 1rem; font-style: italic; color: #475569; margin: 1rem 0; }
+
+      /* Full Phrase Morphing Animation */
+      .phrase-morph-container {
+        display: inline-grid;
+        grid-template-columns: 1fr;
+        align-items: center;
+        justify-items: center;
+        position: relative;
+        height: 1.5em; /* Altura fixa para evitar pulos */
+        overflow: visible;
+      }
+
+      .phrase-morph-item {
+        grid-area: 1 / 1;
+        opacity: 0;
+        filter: blur(10px);
+        transform: translateY(15px) scale(0.98);
+        transition: none;
+        white-space: nowrap;
+        pointer-events: none;
+      }
+
+      /* Frase 1: Português */
+      .phrase-pt {
+        animation: phrase-fade-morph 10s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+      }
+
+      /* Frase 2: Inglês */
+      .phrase-en {
+        animation: phrase-fade-morph 10s cubic-bezier(0.4, 0, 0.2, 1) infinite 5s;
+      }
+
+      @keyframes phrase-fade-morph {
+        0%, 5% {
+          opacity: 0;
+          filter: blur(10px);
+          transform: translateY(15px) scale(0.98);
+        }
+        10%, 45% {
+          opacity: 1;
+          filter: blur(0px);
+          transform: translateY(0px) scale(1);
+          pointer-events: auto;
+        }
+        50%, 100% {
+          opacity: 0;
+          filter: blur(10px);
+          transform: translateY(-15px) scale(0.98);
+        }
+      }
+
+      /* Suavização das cores no destaque */
+      .highlight-text {
+        transition: color 0.3s ease;
+      }
+    </style>
+  <script type="importmap">
+{
+  "imports": {
+    "react-dom/": "https://esm.sh/react-dom@^19.2.4/",
+    "react/": "https://esm.sh/react@^19.2.4/",
+    "react": "https://esm.sh/react@^19.2.4",
+    "lucide-react": "https://esm.sh/lucide-react@^0.563.0",
+    "@google/genai": "https://esm.sh/@google/genai@^1.38.0",
+    "marked": "https://esm.sh/marked@^11.1.1",
+    "dompurify": "https://esm.sh/dompurify@^3.0.8"
+  }
+}
+</script>
+<link rel="stylesheet" href="/index.css">
+</head>
+  <body class="bg-slate-50 text-slate-900 selection:bg-emerald-100">
+    <div id="root"></div>
+    <script type="module" src="/index.tsx"></script>
+  </body>
+</html>
