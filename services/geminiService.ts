@@ -10,7 +10,7 @@ const genAI = new GoogleGenerativeAI(import.meta.env.GEMINI_API_KEY || import.me
  */
 const getConfiguredModel = (context: string) => {
   return genAI.getGenerativeModel({
-    model: "gemini-1.5-flash",
+    model: "gemini-2.5-flash",
     systemInstruction: {
       parts: [{ text: IAM_SYSTEM_INSTRUCTION(context) }],
     },
