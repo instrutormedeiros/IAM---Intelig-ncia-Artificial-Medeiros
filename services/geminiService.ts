@@ -2,7 +2,7 @@
 import { GoogleGenAI, Type } from "@google/genai";
 import { IAM_SYSTEM_INSTRUCTION, EXAM_GEN_PROMPT, SUMMARY_GEN_PROMPT } from "../constants";
 
-const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+const ai = new GoogleGenAI({ apiKey: import.meta.env.VITE_API_KEY });
 
 export async function* askIAMStream(userMessage: string, context: string, chatHistory: any[] = []) {
   const historyWithoutEmpty = chatHistory.filter((m: any) => m?.parts?.[0]?.text?.trim()?.length > 0);
