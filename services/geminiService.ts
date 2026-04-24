@@ -1,22 +1,35 @@
-
-import { GoogleGenAI, Type } from "@google/genai";
+import { GoogleGenerativeAI } from "@google/generative-ai";
 import { IAM_SYSTEM_INSTRUCTION, EXAM_GEN_PROMPT, SUMMARY_GEN_PROMPT } from "../constants";
 
-const ai = new GoogleGenAI({ apiKey: import.meta.env.VITE_API_KEY });
+// Inicialização estável
+const genAI = new GoogleGenerativeAI(import.meta.env.VITE_API_KEY);
+const model = genAI.getGenerativeModel({ 
+  model: "gemini-1.5-flash", // Modelo mais estável para produção
+});
 
 export async function* askIAMStream(userMessage: string, context: string, chatHistory: any[] = []) {
-  const historyWithoutEmpty = chatHistory.filter((m: any) => m?.parts?.[0]?.text?.trim()?.length > 0);
+  // Filtra histórico para evitar partes vazias que travam a API
+  const history = chatHistory
+    .filter(m => m?.parts?.[0]?.text?.trim())
+    .map(m => ({
+      role: m.role === 'user' ? 'user' : 'model',
+      parts: m.parts
+    }));
+
   try {
-    const responseStream = await ai.models.generateContentStream({
-      model: 'gemini-3-flash-001',
-      contents: [...historyWithoutEmpty, { role: 'user', parts: [{ text: userMessage }] }],
-      config: { systemInstruction: IAM_SYSTEM_INSTRUCTION(context), temperature: 0.7 },
+    const chat = model.startChat({
+      history: history,
+      generationConfig: {
+        temperature: 0.7,
+      },
+      systemInstruction: IAM_SYSTEM_INSTRUCTION(context),
     });
+
+    const result = await chat.sendMessageStream(userMessage);
     
-    for await (const chunk of responseStream) {
-      if (chunk.text) {
-        yield chunk.text;
-      }
+    for await (const chunk of result.stream) {
+      const chunkText = chunk.text();
+      if (chunkText) yield chunkText;
     }
   } catch (error) {
     console.error("Erro no stream do Gemini:", error);
@@ -24,15 +37,13 @@ export async function* askIAMStream(userMessage: string, context: string, chatHi
   }
 }
 
-// Mantemos as funções não-stream para Resumo e Simulado pois são conteúdos estruturados únicos
 export async function generateSummary(context: string, topic: string) {
   try {
-    const response = await ai.models.generateContent({
-      model: 'gemini-2.5-flash',
+    const result = await model.generateContent({
       contents: [{ role: 'user', parts: [{ text: SUMMARY_GEN_PROMPT(topic) }] }],
-      config: { systemInstruction: IAM_SYSTEM_INSTRUCTION(context) },
+      systemInstruction: IAM_SYSTEM_INSTRUCTION(context),
     });
-    return response.text || "Não foi possível gerar o resumo.";
+    return result.response.text();
   } catch (error) {
     return "Erro ao gerar resumo.";
   }
@@ -40,39 +51,18 @@ export async function generateSummary(context: string, topic: string) {
 
 export async function generateExam(context: string, topic: string) {
   const randomSeed = Math.random().toString(36).substring(7) + Date.now();
-  
   try {
-    const response = await ai.models.generateContent({
-      model: 'gemini-2.5-flash',
+    const result = await model.generateContent({
       contents: [{ role: 'user', parts: [{ text: EXAM_GEN_PROMPT(topic, randomSeed) }] }],
-      config: { 
-        systemInstruction: IAM_SYSTEM_INSTRUCTION(context),
+      generationConfig: {
         responseMimeType: "application/json",
-        responseSchema: {
-          type: Type.ARRAY,
-          items: {
-            type: Type.OBJECT,
-            properties: {
-              id: { type: Type.NUMBER },
-              question: { type: Type.STRING },
-              options: { type: Type.ARRAY, items: { type: Type.STRING } },
-              correctAnswer: { type: Type.NUMBER },
-              explanation: { type: Type.STRING },
-            },
-            required: ["id", "question", "options", "correctAnswer", "explanation"],
-          },
-        },
-        temperature: 1.0,
       },
     });
     
-    let text = response.text.trim();
+    let text = result.response.text().trim();
     if (text.startsWith("```json")) {
       text = text.replace(/^```json/, "").replace(/```$/, "").trim();
-    } else if (text.startsWith("```")) {
-      text = text.replace(/^```/, "").replace(/```$/, "").trim();
     }
-    
     return JSON.parse(text);
   } catch (error) {
     console.error("Erro ao gerar simulado:", error);
