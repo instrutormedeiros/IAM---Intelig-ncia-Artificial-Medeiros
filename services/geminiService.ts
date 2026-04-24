@@ -8,7 +8,7 @@ export async function* askIAMStream(userMessage: string, context: string, chatHi
   const historyWithoutEmpty = chatHistory.filter((m: any) => m?.parts?.[0]?.text?.trim()?.length > 0);
   try {
     const responseStream = await ai.models.generateContentStream({
-      model: 'gemini-pro',
+      model: 'gemini-3-flash',
       contents: [...historyWithoutEmpty, { role: 'user', parts: [{ text: userMessage }] }],
       config: { systemInstruction: IAM_SYSTEM_INSTRUCTION(context), temperature: 0.7 },
     });
