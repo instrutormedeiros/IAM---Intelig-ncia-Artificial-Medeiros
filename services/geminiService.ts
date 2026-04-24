@@ -4,7 +4,7 @@ import { IAM_SYSTEM_INSTRUCTION, EXAM_GEN_PROMPT, SUMMARY_GEN_PROMPT } from "../
 // Inicialização estável
 const genAI = new GoogleGenerativeAI(import.meta.env.VITE_API_KEY);
 const model = genAI.getGenerativeModel({ 
-  model: "gemini-2.5-flash", // Modelo mais estável para produção
+  model: "gemini-1.5-flash", // Modelo mais estável para produção
 });
 
 export async function* askIAMStream(userMessage: string, context: string, chatHistory: any[] = []) {
