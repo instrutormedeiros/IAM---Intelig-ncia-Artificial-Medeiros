@@ -2,7 +2,7 @@ import { GoogleGenerativeAI } from "@google/generative-ai";
 import { IAM_SYSTEM_INSTRUCTION, EXAM_GEN_PROMPT, SUMMARY_GEN_PROMPT } from "../constants";
 
 // Inicialização estável com a variável de ambiente correta da Vercel
-const genAI = new GoogleGenerativeAI(import.meta.env.VITE_API_KEY);
+const genAI = new GoogleGenerativeAI(import.meta.env.GEMINI_API_KEY || import.meta.env.VITE_API_KEY);
 
 /**
  * Função auxiliar para criar o modelo com a System Instruction formatada corretamente
